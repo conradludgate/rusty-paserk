@@ -1,8 +1,5 @@
 use std::{fmt, str::FromStr};
 
-use base64::URL_SAFE_NO_PAD;
-use cipher::Unsigned;
-use generic_array::GenericArray;
 use rusty_paseto::core::PasetoError;
 
 use crate::{write_b64, Key, KeyType, Version};
@@ -27,13 +24,7 @@ impl<V: Version, K: KeyType<V>> FromStr for PlaintextKey<V, K> {
             .ok_or(PasetoError::WrongHeader)?;
         let s = s.strip_prefix(K::HEADER).ok_or(PasetoError::WrongHeader)?;
 
-        let mut key = GenericArray::<u8, K::KeyLen>::default();
-        let len = base64::decode_config_slice(s, URL_SAFE_NO_PAD, &mut key)?;
-        if len != <K::KeyLen as Unsigned>::USIZE {
-            return Err(PasetoError::PayloadBase64Decode {
-                source: base64::DecodeError::InvalidLength,
-            });
-        }
+        let key = crate::read_b64(s)?;
 
         Ok(PlaintextKey(Key { key }))
     }

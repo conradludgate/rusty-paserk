@@ -438,18 +438,18 @@ impl<V: SealedVersion> fmt::Display for SealedKey<V> {
 
 #[cfg(any(test, fuzzing))]
 pub mod fuzz_tests {
-    use rusty_paseto::core::{V3, V4};
-
     use crate::{fuzzing::FakeRng, Key, Local, Secret};
 
+    #[cfg(feature = "v3")]
     #[derive(Debug)]
     #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct V3SealInput {
-        key: Key<V3, Local>,
-        secret_key: Key<V3, Secret>,
+        key: Key<rusty_paseto::core::V3, Local>,
+        secret_key: Key<rusty_paseto::core::V3, Secret>,
         ephemeral: FakeRng<48>,
     }
 
+    #[cfg(feature = "v3")]
     impl V3SealInput {
         pub fn run(mut self) {
             let x: Option<p384::Scalar> =
@@ -469,14 +469,16 @@ pub mod fuzz_tests {
         }
     }
 
+    #[cfg(feature = "v4")]
     #[derive(Debug)]
     #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct V4SealInput {
-        key: Key<V4, Local>,
-        secret_key: Key<V4, Secret>,
+        key: Key<rusty_paseto::core::V4, Local>,
+        secret_key: Key<rusty_paseto::core::V4, Secret>,
         ephemeral: FakeRng<32>,
     }
 
+    #[cfg(feature = "v4")]
     impl V4SealInput {
         pub fn run(mut self) {
             let sealed = self
