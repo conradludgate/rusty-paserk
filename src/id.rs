@@ -1,6 +1,5 @@
 use std::{fmt, marker::PhantomData, str::FromStr};
 
-use base64::URL_SAFE_NO_PAD;
 use generic_array::{typenum::U33, GenericArray};
 
 use rusty_paseto::core::PasetoError;
@@ -62,13 +61,7 @@ impl<V: Version, K: KeyType<V>> FromStr for KeyId<V, K> {
             .ok_or(PasetoError::WrongHeader)?;
         let s = s.strip_prefix(K::ID).ok_or(PasetoError::WrongHeader)?;
 
-        let mut id = GenericArray::<u8, U33>::default();
-        let len = base64::decode_config_slice(s, URL_SAFE_NO_PAD, &mut id)?;
-        if len != 33 {
-            return Err(PasetoError::PayloadBase64Decode {
-                source: base64::DecodeError::InvalidLength,
-            });
-        }
+        let id = crate::read_b64(s)?;
 
         Ok(KeyId {
             id,

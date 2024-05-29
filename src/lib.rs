@@ -212,7 +212,7 @@ fn read_b64<L: GenericSequence<u8> + DerefMut<Target = [u8]> + Default>(
     let expected_len = (s.len() + 3) / 4 * 3;
     if expected_len < <L::Length as Unsigned>::USIZE {
         return Err(PasetoError::PayloadBase64Decode {
-            source: base64::DecodeError::InvalidLength,
+            source: base64::DecodeError::InvalidLength(s.len()),
         });
     }
 
@@ -220,13 +220,13 @@ fn read_b64<L: GenericSequence<u8> + DerefMut<Target = [u8]> + Default>(
 
     let len = base64ct::Base64UrlUnpadded::decode(s, &mut total)
         .map_err(|_| PasetoError::PayloadBase64Decode {
-            source: base64::DecodeError::InvalidLength,
+            source: base64::DecodeError::InvalidLength(s.len()),
         })?
         .len();
 
     if len != <L::Length as Unsigned>::USIZE {
         return Err(PasetoError::PayloadBase64Decode {
-            source: base64::DecodeError::InvalidLength,
+            source: base64::DecodeError::InvalidLength(s.len()),
         });
     }
 
@@ -289,7 +289,10 @@ pub mod fuzzing {
     impl<const N: usize> CryptoRng for FakeRng<N> {}
 
     pub mod seal {
-        pub use crate::pke::fuzz_tests::{V3SealInput, V4SealInput};
+        #[cfg(feature = "v3")]
+        pub use crate::pke::fuzz_tests::V3SealInput;
+        #[cfg(feature = "v4")]
+        pub use crate::pke::fuzz_tests::V4SealInput;
     }
     pub mod wrap {
         pub use crate::wrap::fuzz_tests::FuzzInput;

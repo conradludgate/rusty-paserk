@@ -4,7 +4,7 @@ use libtest_mimic::{Arguments, Failed, Trial};
 use rusty_paserk::{
     internal::{PieVersion, PieWrapType, PwVersion, PwWrapType, SealedVersion},
     Key, KeyId, KeyType, Local, PasetoError, PieWrappedKey, PlaintextKey, Public, PwWrappedKey,
-    SealedKey, Secret, Version, V3, V4,
+    SealedKey, Secret, Version,
 };
 use serde::{de::DeserializeOwned, Deserialize};
 
@@ -48,12 +48,20 @@ struct IdTest {
 
 impl IdTest {
     fn add_all_tests(tests: &mut Vec<Trial>) {
-        Self::add_tests::<V3, Local>(tests);
-        Self::add_tests::<V4, Local>(tests);
-        Self::add_tests::<V3, Secret>(tests);
-        Self::add_tests::<V4, Secret>(tests);
-        Self::add_tests::<V3, Public>(tests);
-        Self::add_tests::<V4, Public>(tests);
+        #[cfg(feature = "v3")]
+        {
+            use rusty_paserk::V3;
+            Self::add_tests::<V3, Local>(tests);
+            Self::add_tests::<V3, Secret>(tests);
+            Self::add_tests::<V3, Public>(tests);
+        }
+        #[cfg(feature = "v4")]
+        {
+            use rusty_paserk::V4;
+            Self::add_tests::<V4, Local>(tests);
+            Self::add_tests::<V4, Secret>(tests);
+            Self::add_tests::<V4, Public>(tests);
+        }
     }
 
     fn add_tests<V: Version, K: KeyType<V>>(tests: &mut Vec<Trial>)
@@ -97,12 +105,20 @@ struct KeyTest {
 
 impl KeyTest {
     fn add_all_tests(tests: &mut Vec<Trial>) {
-        Self::add_tests::<V3, Local>(tests);
-        Self::add_tests::<V4, Local>(tests);
-        Self::add_tests::<V3, Secret>(tests);
-        Self::add_tests::<V4, Secret>(tests);
-        Self::add_tests::<V3, Public>(tests);
-        Self::add_tests::<V4, Public>(tests);
+        #[cfg(feature = "v3")]
+        {
+            use rusty_paserk::V3;
+            Self::add_tests::<V3, Local>(tests);
+            Self::add_tests::<V3, Secret>(tests);
+            Self::add_tests::<V3, Public>(tests);
+        }
+        #[cfg(feature = "v4")]
+        {
+            use rusty_paserk::V4;
+            Self::add_tests::<V4, Local>(tests);
+            Self::add_tests::<V4, Secret>(tests);
+            Self::add_tests::<V4, Public>(tests);
+        }
     }
 
     fn add_tests<V: Version, K: KeyType<V>>(tests: &mut Vec<Trial>)
@@ -155,10 +171,18 @@ struct PbkwTest {
 
 impl PbkwTest {
     fn add_all_tests(tests: &mut Vec<Trial>) {
-        Self::add_tests::<V3, Local>(tests);
-        Self::add_tests::<V4, Local>(tests);
-        Self::add_tests::<V3, Secret>(tests);
-        Self::add_tests::<V4, Secret>(tests);
+        #[cfg(feature = "v3")]
+        {
+            use rusty_paserk::V3;
+            Self::add_tests::<V3, Local>(tests);
+            Self::add_tests::<V3, Secret>(tests);
+        }
+        #[cfg(feature = "v4")]
+        {
+            use rusty_paserk::V4;
+            Self::add_tests::<V4, Local>(tests);
+            Self::add_tests::<V4, Secret>(tests);
+        }
     }
 
     fn add_tests<V: PwVersion, K: PwWrapType<V>>(tests: &mut Vec<Trial>) {
@@ -206,8 +230,10 @@ struct PkeTest {
 
 impl PkeTest {
     fn add_all_tests(tests: &mut Vec<Trial>) {
-        Self::add_tests::<V3>(tests);
-        Self::add_tests::<V4>(tests);
+        #[cfg(feature = "v3")]
+        Self::add_tests::<rusty_paserk::V3>(tests);
+        #[cfg(feature = "v4")]
+        Self::add_tests::<rusty_paserk::V4>(tests);
     }
 
     fn add_tests<V: SealedVersion>(tests: &mut Vec<Trial>)
@@ -261,10 +287,18 @@ struct PieWrapTest {
 
 impl PieWrapTest {
     fn add_all_tests(tests: &mut Vec<Trial>) {
-        Self::add_tests::<V3, Local>(tests);
-        Self::add_tests::<V4, Local>(tests);
-        Self::add_tests::<V3, Secret>(tests);
-        Self::add_tests::<V4, Secret>(tests);
+        #[cfg(feature = "v3")]
+        {
+            use rusty_paserk::V3;
+            Self::add_tests::<V3, Local>(tests);
+            Self::add_tests::<V3, Secret>(tests);
+        }
+        #[cfg(feature = "v4")]
+        {
+            use rusty_paserk::V4;
+            Self::add_tests::<V4, Local>(tests);
+            Self::add_tests::<V4, Secret>(tests);
+        }
     }
 
     fn add_tests<V: PieVersion, K: PieWrapType<V>>(tests: &mut Vec<Trial>)
@@ -311,61 +345,72 @@ trait NewKey {
     fn from_key(s: &str) -> Self;
 }
 
-impl NewKey for Key<V3, Local> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_bytes(b.try_into().unwrap())
-    }
-}
-
-impl NewKey for Key<V4, Local> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_bytes(b.try_into().unwrap())
-    }
-}
-
-impl NewKey for Key<V3, Secret> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_bytes(&b).unwrap()
-    }
-}
-
-impl NewKey for Key<V4, Secret> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_keypair_bytes(&b).unwrap()
-    }
-}
-
-impl NewKey for Key<V3, Public> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_sec1_bytes(&b).unwrap()
-    }
-}
-
-impl NewKey for Key<V4, Public> {
-    fn from_key(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_public_key(&b).unwrap()
-    }
-}
-
 trait NewKey2 {
     fn from_key2(s: &str) -> Self;
 }
 
-impl NewKey2 for Key<V3, Secret> {
-    fn from_key2(s: &str) -> Self {
-        Self::from_sec1_pem(s).unwrap()
+#[cfg(feature = "v3")]
+mod v3_impls {
+    use super::*;
+    use rusty_paserk::V3;
+
+    impl NewKey for Key<V3, Local> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_bytes(b.try_into().unwrap())
+        }
+    }
+
+    impl NewKey for Key<V3, Secret> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_bytes(&b).unwrap()
+        }
+    }
+
+    impl NewKey for Key<V3, Public> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_sec1_bytes(&b).unwrap()
+        }
+    }
+
+    impl NewKey2 for Key<V3, Secret> {
+        fn from_key2(s: &str) -> Self {
+            Self::from_sec1_pem(s).unwrap()
+        }
     }
 }
 
-impl NewKey2 for Key<V4, Secret> {
-    fn from_key2(s: &str) -> Self {
-        let b = hex::decode(s).unwrap();
-        Self::from_keypair_bytes(&b).unwrap()
+#[cfg(feature = "v4")]
+mod v4_impls {
+    use super::*;
+    use rusty_paserk::V4;
+
+    impl NewKey for Key<V4, Local> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_bytes(b.try_into().unwrap())
+        }
+    }
+    impl NewKey for Key<V4, Secret> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_keypair_bytes(&b).unwrap()
+        }
+    }
+
+    impl NewKey for Key<V4, Public> {
+        fn from_key(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_public_key(&b).unwrap()
+        }
+    }
+
+    impl NewKey2 for Key<V4, Secret> {
+        fn from_key2(s: &str) -> Self {
+            let b = hex::decode(s).unwrap();
+            Self::from_keypair_bytes(&b).unwrap()
+        }
     }
 }
