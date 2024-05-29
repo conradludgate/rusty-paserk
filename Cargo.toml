@@ -19,23 +19,23 @@ categories = [
 default = ["v4"]
 # V3 contains NIST approved algoritms only
 v3 = [
-  "hmac",
-  "aes",
-  "ctr",
-  "sha2",
-  "p384",
-  "pbkdf2",
+  "dep:hmac",
+  "dep:aes",
+  "dep:ctr",
+  "dep:sha2",
+  "dep:p384",
+  "dep:pbkdf2",
   "rusty_paseto/v3_local",
   "rusty_paseto/v3_public",
 ]
 # V4 is recommended
 v4 = [
-  "sha2",
-  "blake2",
-  "chacha20",
-  "ed25519-dalek",
-  "curve25519-dalek",
-  "argon2",
+  "dep:sha2",
+  "dep:blake2",
+  "dep:chacha20",
+  "dep:ed25519-dalek",
+  "dep:curve25519-dalek",
+  "dep:argon2",
   "rusty_paseto/v4_local",
   "rusty_paseto/v4_public"
 ]
