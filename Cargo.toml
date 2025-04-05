@@ -77,7 +77,7 @@ serde = { version = "1", features = ["derive"] }
 hex = "0.4"
 ff = "0.13.0"
 
-libtest-mimic = "0.7.3"
+libtest-mimic = "0.8.1"
 
 [profile.dev.package."*"]
 opt-level = 2
