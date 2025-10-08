@@ -91,5 +91,6 @@ harness = false
 
 # Properly document all features on docs.rs
 [package.metadata.docs.rs]
-all-features = true
+# all-features = true
+features = ["v4"]
 rustdoc-args = ["--cfg", "docsrs"]
