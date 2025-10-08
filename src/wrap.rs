@@ -417,6 +417,7 @@ impl PieWrapType<V4> for Secret {
 
 #[cfg(any(test, fuzzing))]
 pub mod fuzz_tests {
+    #![allow(missing_docs)]
     use crate::{fuzzing::FakeRng, Key, Local};
 
     use super::{PieVersion, PieWrapType};

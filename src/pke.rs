@@ -438,6 +438,7 @@ impl<V: SealedVersion> fmt::Display for SealedKey<V> {
 
 #[cfg(any(test, fuzzing))]
 pub mod fuzz_tests {
+    #![allow(missing_docs)]
     use crate::{fuzzing::FakeRng, Key, Local, Secret};
 
     #[cfg(feature = "v3")]

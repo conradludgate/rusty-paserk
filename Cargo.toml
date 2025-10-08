@@ -94,3 +94,6 @@ harness = false
 # all-features = true
 features = ["v4"]
 rustdoc-args = ["--cfg", "docsrs"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)', 'cfg(fuzzing_repro)'] }

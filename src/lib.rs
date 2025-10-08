@@ -209,7 +209,7 @@ fn write_b64<W: std::fmt::Write>(b: &[u8], w: &mut W) -> std::fmt::Result {
 fn read_b64<L: GenericSequence<u8> + DerefMut<Target = [u8]> + Default>(
     s: &str,
 ) -> Result<L, PasetoError> {
-    let expected_len = (s.len() + 3) / 4 * 3;
+    let expected_len = s.len().div_ceil(4) * 3;
     if expected_len < <L::Length as Unsigned>::USIZE {
         return Err(PasetoError::PayloadBase64Decode {
             source: base64::DecodeError::InvalidLength(s.len()),
@@ -238,6 +238,7 @@ pub trait SafeForFooter {}
 
 #[cfg(any(test, fuzzing))]
 pub mod fuzzing {
+    #![allow(missing_docs)]
     use rand::{CryptoRng, RngCore};
 
     #[derive(Clone, Debug)]
